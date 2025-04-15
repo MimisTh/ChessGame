@@ -3,6 +3,94 @@ import sys
 from pygame.locals import *
 from ..config import SQUARE_SIZE, BOARD_PX, WINDOW_WIDTH, WINDOW_HEIGHT, LIGHT, DARK, BLACK, WHITE
 
+def show_game_mode_selection(window):
+    """Εμφάνιση μενού επιλογής τρόπου παιχνιδιού"""
+    # Καθαρισμός παραθύρου
+    window.fill((240, 240, 240))
+    
+    # Δημιουργία τίτλου
+    title_font = pygame.font.SysFont('Arial', 48, bold=True)
+    title = title_font.render("Σκάκι ΠΛΗΠΡΟ", True, (0, 0, 0))
+    title_rect = title.get_rect(center=(WINDOW_WIDTH // 2, 150))
+    window.blit(title, title_rect)
+    
+    # Δημιουργία τίτλου επιλογής
+    subtitle_font = pygame.font.SysFont('Arial', 32, bold=True)
+    subtitle = subtitle_font.render("Επιλέξτε τρόπο παιχνιδιού:", True, (0, 0, 0))
+    subtitle_rect = subtitle.get_rect(center=(WINDOW_WIDTH // 2, 220))
+    window.blit(subtitle, subtitle_rect)
+    
+    # Επιλογές παιχνιδιού
+    button_font = pygame.font.SysFont('Arial', 24)
+    button_width, button_height = 300, 60
+    
+    # Κουμπί για παιχνίδι με άλλον παίκτη
+    pvp_button = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 280, button_width, button_height)
+    pygame.draw.rect(window, (200, 200, 200), pvp_button)
+    pygame.draw.rect(window, (0, 0, 0), pvp_button, 2)
+    pvp_text = button_font.render("Παίκτης εναντίον Παίκτη", True, (0, 0, 0))
+    pvp_rect = pvp_text.get_rect(center=pvp_button.center)
+    window.blit(pvp_text, pvp_rect)
+    
+    # Κουμπί για παιχνίδι με υπολογιστή (εύκολο)
+    pve_easy_button = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 350, button_width, button_height)
+    pygame.draw.rect(window, (200, 200, 200), pve_easy_button)
+    pygame.draw.rect(window, (0, 0, 0), pve_easy_button, 2)
+    pve_easy_text = button_font.render("Παίκτης εναντίον AI (Εύκολο)", True, (0, 0, 0))
+    pve_easy_rect = pve_easy_text.get_rect(center=pve_easy_button.center)
+    window.blit(pve_easy_text, pve_easy_rect)
+    
+    # Κουμπί για παιχνίδι με υπολογιστή (μεσαίο)
+    pve_medium_button = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 420, button_width, button_height)
+    pygame.draw.rect(window, (200, 200, 200), pve_medium_button)
+    pygame.draw.rect(window, (0, 0, 0), pve_medium_button, 2)
+    pve_medium_text = button_font.render("Παίκτης εναντίον AI (Μεσαίο)", True, (0, 0, 0))
+    pve_medium_rect = pve_medium_text.get_rect(center=pve_medium_button.center)
+    window.blit(pve_medium_text, pve_medium_rect)
+    
+    # Κουμπί για παιχνίδι με υπολογιστή (δύσκολο)
+    pve_hard_button = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 490, button_width, button_height)
+    pygame.draw.rect(window, (200, 200, 200), pve_hard_button)
+    pygame.draw.rect(window, (0, 0, 0), pve_hard_button, 2)
+    pve_hard_text = button_font.render("Παίκτης εναντίον AI (Δύσκολο)", True, (0, 0, 0))
+    pve_hard_rect = pve_hard_text.get_rect(center=pve_hard_button.center)
+    window.blit(pve_hard_text, pve_hard_rect)
+    
+    # Κουμπί για παιχνίδι με AI που μιμείται το στυλ ενός παίκτη
+    clone_button = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 560, button_width, button_height)
+    pygame.draw.rect(window, (180, 220, 180), clone_button)  # Διαφορετικό χρώμα για έμφαση
+    pygame.draw.rect(window, (0, 100, 0), clone_button, 2)
+    clone_text = button_font.render("Παίκτης εναντίον Clone AI", True, (0, 80, 0))
+    clone_rect = clone_text.get_rect(center=clone_button.center)
+    window.blit(clone_text, clone_rect)
+    
+    # Επεξήγηση για το κουμπί Clone
+    info_font = pygame.font.SysFont('Arial', 16, italic=True)
+    info_text = info_font.render("(Μιμείται το στυλ παίκτη από αρχεία PGN της chess.com)", True, (100, 100, 100))
+    info_rect = info_text.get_rect(center=((WINDOW_WIDTH) // 2, 605))
+    window.blit(info_text, info_rect)
+    
+    pygame.display.flip()
+    
+    # Περιμένουμε την επιλογή του χρήστη
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = event.pos
+                if pvp_button.collidepoint(mouse_pos):
+                    return "PVP", None
+                elif pve_easy_button.collidepoint(mouse_pos):
+                    return "PVE", 1
+                elif pve_medium_button.collidepoint(mouse_pos):
+                    return "PVE", 2
+                elif pve_hard_button.collidepoint(mouse_pos):
+                    return "PVE", 3
+                elif clone_button.collidepoint(mouse_pos):
+                    return "CLONE", None
+
 def load_pieces():
     """Συνάρτηση για την φόρτωση των πιονιών"""
     pieces = {}
@@ -129,7 +217,7 @@ def draw_pieces(surface, board_state, pieces):
     for row in range(8):
         for col in range(8):
             piece = board_state[row][col]
-            if piece:
+            if (piece):
                 x = col * SQUARE_SIZE
                 y = row * SQUARE_SIZE
                 surface.blit(pieces[piece], (x, y))
@@ -152,7 +240,7 @@ def draw_message_panel(surface, message, turn, game_over):
     msg_font = pygame.font.SysFont('Arial', 22)
     turn_font = pygame.font.SysFont('Arial', 24, bold=True)
     
-    # Δημιουργία τίτλου και στρογγυλεμένου πλαισίου
+    # Κεφαλίδα παιχνιδιού - σταθερή θέση στην κορυφή
     title = title_font.render("Σκάκι ΠΛΗΠΡΟ", True, BLACK)
     surface.blit(title, (BOARD_PX + 20, 30))
     
@@ -167,15 +255,29 @@ def draw_message_panel(surface, message, turn, game_over):
     turn_label = turn_font.render(turn_text, True, turn_color)
     surface.blit(turn_label, (BOARD_PX + 20, 80))
     
-    # Σχεδίαση μηνυμάτων κατάστασης
-    y_pos = 320  # Τοποθέτηση κάτω από το χρονόμετρο
+    # Υπολογισμός διαθέσιμου χώρου στο κάτω μέρος του panel 
+    # (αφήνουμε επαρκή χώρο για τα χρονόμετρα που τοποθετούνται ως το y_pos ~300)
+    bottom_section_y = WINDOW_HEIGHT - 150  # Τοποθέτηση των μηνυμάτων 150px από το κάτω μέρος του παραθύρου
+    
+    # Δημιουργία διαχωριστικής γραμμής μεταξύ χρονομέτρου και μηνυμάτων
+    pygame.draw.line(surface, (200, 200, 200), 
+                    (BOARD_PX + 10, bottom_section_y - 10),
+                    (WINDOW_WIDTH - 10, bottom_section_y - 10), 1)
+    
+    # Κεφαλίδα τμήματος μηνυμάτων
+    status_font = pygame.font.SysFont('Arial', 20, bold=True)
+    status_label = status_font.render("Μηνύματα Παιχνιδιού:", True, (100, 100, 100))
+    surface.blit(status_label, (BOARD_PX + 20, bottom_section_y))
+    
+    # Σχεδίαση μηνυμάτων κατάστασης με αναδίπλωση κειμένου
+    y_pos = bottom_section_y + 30  # Αρχή των μηνυμάτων κάτω από την κεφαλίδα
     words = message.split()
     lines = []
     current_line = []
     
     for word in words:
         test_line = ' '.join(current_line + [word])
-        if msg_font.size(test_line)[0] < 280:
+        if msg_font.size(test_line)[0] < 380:  # Αυξημένο πλάτος για καλύτερη αξιοποίηση χώρου
             current_line.append(word)
         else:
             lines.append(' '.join(current_line))
@@ -184,7 +286,13 @@ def draw_message_panel(surface, message, turn, game_over):
     if current_line:
         lines.append(' '.join(current_line))
     
+    # Δημιουργία πλαισίου για μηνύματα
+    message_height = len(lines) * 25 + 10
+    pygame.draw.rect(surface, (250, 250, 250), 
+                    (BOARD_PX + 15, y_pos - 5, 420, message_height),
+                    0, 5)  # Στρογγυλεμένο πλαίσιο για μηνύματα
+    
     for line in lines:
         text = msg_font.render(line, True, BLACK)
-        surface.blit(text, (BOARD_PX + 20, y_pos))
+        surface.blit(text, (BOARD_PX + 25, y_pos))
         y_pos += 25
